@@ -13,8 +13,21 @@
     "infra:plan:prod": "terraform -chdir=infra plan -var-file=environments/prod.tfvars",
     "infra:apply:prod": "terraform -chdir=infra apply -var-file=environments/prod.tfvars -auto-approve",
     "infra:destroy:prod": "terraform -chdir=infra destroy -var-file=environments/prod.tfvars -auto-approve",
-    "deploy:dev": "npm run app:build && npm run infra:apply:dev",
-    "start": "npm run app:dev"
+    "deploy:app:dev": "npm run app:build && aws s3 sync app/out/ s3://$(terraform -chdir=infra output -raw s3_bucket_name) --delete",
+    "deploy:app:prod": "npm run app:build && aws s3 sync app/out/ s3://$(terraform -chdir=infra output -raw s3_bucket_name --var-file=environments/prod.tfvars) --delete",
+    "start": "npm run app:dev",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^13.3.0"
+  },
+  "lint-staged": {
+    "app/**/*.{js,jsx,ts,tsx}": [
+      "npm run lint --prefix app",
+      "npm run format --prefix app"
+    ]
   },
   "postinstall": "npm install --prefix app && npm run infra:init"
 }

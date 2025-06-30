@@ -3,6 +3,9 @@
 /app/out/
 /app/next-env.d.ts
 /app/node_modules/
+/app/.eslintrc.json
+/app/.prettierignore
+/app/.prettierrc.json
 
 # Terraform
 /infra/.terraform/
@@ -13,6 +16,7 @@
 infra/**/*.tfvars
 
 # Node.js
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

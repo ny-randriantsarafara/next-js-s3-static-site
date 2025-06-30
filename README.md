@@ -75,23 +75,27 @@ All infrastructure commands are aliased as npm scripts in the root `package.json
 
 To build the Next.js application and deploy it to the provisioned S3 bucket:
 
-1.  **Build the Next.js application:**
+1.  **Deploy the application to the development environment:**
     ```bash
-    npm run app:build
+    npm run deploy:app:dev
     ```
-    This will generate the static assets in the `app/out/` directory.
+    This script will:
+    *   Build the Next.js application (output to `app/out/`).
+    *   Dynamically retrieve the S3 bucket name from Terraform outputs.
+    *   Synchronize the built files to the S3 bucket.
 
-2.  **Deploy the application to the development environment (builds app and applies infra):**
+    For production deployment, use:
     ```bash
-    npm run deploy:dev
+    npm run deploy:app:prod
     ```
-    *Note: This script currently only applies the infrastructure. You will need to manually sync the `app/out/` directory to your S3 bucket using the AWS CLI after the infrastructure is provisioned.*
 
-    Example `aws s3 sync` command (replace `your-unique-bucket-name` with the actual bucket name from your Terraform output):
-    ```bash
-    aws s3 sync app/out/ s3://your-unique-bucket-name --delete
-    ```
+## Pre-commit Hooks
+
+This repository uses [Husky](https://typicode.github.io/husky/) and [lint-staged](https://github.com/okonet/lint-staged/) to automatically format and lint code before commits. When you commit changes, the following will happen:
+
+*   Files staged for commit will be linted and formatted according to the configurations in `app/.eslintrc.json` and `app/.prettierrc.json`.
+*   Any formatting fixes will be automatically added to your commit.
 
 ## Accessing Your Site
 
-Once the application assets are synced to the S3 bucket, your static Next.js site will be accessible via the S3 website endpoint. You can find this endpoint in the Terraform output after `terraform apply` or by checking the S3 bucket properties in the AWS console.
+Once the application assets are synced to the S3 bucket, your static site will be accessible via the S3 website endpoint. You can find this endpoint in the Terraform output after `terraform apply` or by checking the S3 bucket properties in the AWS console.
