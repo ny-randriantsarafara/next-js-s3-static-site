@@ -1,0 +1,20 @@
+{
+  "name": "nextjs-s3-static-site-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "app:dev": "npm run dev --prefix app",
+    "app:build": "npm run build --prefix app",
+    "app:start": "npm run start --prefix app",
+    "infra:init": "terraform -chdir=infra init",
+    "infra:plan:dev": "terraform -chdir=infra plan -var-file=environments/dev.tfvars",
+    "infra:apply:dev": "terraform -chdir=infra apply -var-file=environments/dev.tfvars -auto-approve",
+    "infra:destroy:dev": "terraform -chdir=infra destroy -var-file=environments/dev.tfvars -auto-approve",
+    "infra:plan:prod": "terraform -chdir=infra plan -var-file=environments/prod.tfvars",
+    "infra:apply:prod": "terraform -chdir=infra apply -var-file=environments/prod.tfvars -auto-approve",
+    "infra:destroy:prod": "terraform -chdir=infra destroy -var-file=environments/prod.tfvars -auto-approve",
+    "deploy:dev": "npm run app:build && npm run infra:apply:dev",
+    "start": "npm run app:dev"
+  },
+  "postinstall": "npm install --prefix app && npm run infra:init"
+}
