@@ -5,7 +5,7 @@ output "s3_bucket_name" {
 
 output "website_endpoint" {
   description = "The S3 static website endpoint."
-  value       = aws_s3_bucket.static_site_bucket.website_endpoint
+  value       = aws_s3_bucket_website_configuration.static_site_website_configuration.website_endpoint
 }
 
 output "s3_bucket_arn" {

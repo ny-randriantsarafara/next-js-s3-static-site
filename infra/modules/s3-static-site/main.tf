@@ -7,6 +7,19 @@ resource "aws_s3_bucket" "static_site_bucket" {
   }
 }
 
+# IMPORTANT: This block disables public access blocking for the S3 bucket.
+# This is necessary for directly serving a public static website from S3.
+# If you intend to serve a private site or use CloudFront with OAC,
+# you should re-enable these settings and configure CloudFront accordingly.
+resource "aws_s3_bucket_public_access_block" "static_site_public_access_block" {
+  bucket = aws_s3_bucket.static_site_bucket.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
 resource "aws_s3_bucket_website_configuration" "static_site_website_configuration" {
   bucket = aws_s3_bucket.static_site_bucket.id
 
@@ -37,4 +50,5 @@ resource "aws_s3_bucket_policy" "static_site_bucket_policy" {
       }
     ]
   })
+  depends_on = [aws_s3_bucket_public_access_block.static_site_public_access_block]
 }
