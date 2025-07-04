@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        type: choice
+        options:
+          - development
+          - production
+
+jobs:
+  deploy-app:
+    environment: ${{ github.event.inputs.environment || 'development' }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CI_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy Application
+        run: |
+          ./scripts/deploy_app.sh ${{ github.event.inputs.environment || 'development' }}

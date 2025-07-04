@@ -11,8 +11,18 @@ fi
 echo "Building Next.js application..."
 npm run app:build
 
+echo "Initializing Terraform..."
+terraform -chdir=infra init
+
 echo "Getting S3 bucket name for $ENV environment..."
-S3_BUCKET_NAME=$(terraform -chdir=infra output -raw s3_bucket_name)
+TFVARS_FILE=${2:-}
+
+TFVARS_ARG=""
+if [ -n "$TFVARS_FILE" ]; then
+  TFVARS_ARG="-var-file=$TFVARS_FILE"
+fi
+
+S3_BUCKET_NAME=$(terraform -chdir=infra output -raw s3_bucket_name $TFVARS_ARG)
 
 if [ -z "$S3_BUCKET_NAME" ]; then
   echo "Error: Could not retrieve S3 bucket name for $ENV environment."

@@ -11,5 +11,7 @@ fi
 echo "Initializing Terraform..."
 terraform -chdir=infra init
 
-echo "Destroying infrastructure for $ENV..."
-terraform -chdir=infra destroy -var-file=environments/$ENV.tfvars -auto-approve
+TFVARS_FILE=${2:-environments/$ENV.tfvars}
+
+echo "Destroying infrastructure for $ENV using $TFVARS_FILE..."
+terraform -chdir=infra destroy -var-file=$TFVARS_FILE -auto-approve

@@ -11,8 +11,10 @@ fi
 echo "Initializing Terraform..."
 terraform -chdir=infra init
 
-echo "Planning infrastructure for $ENV..."
-terraform -chdir=infra plan -var-file=environments/$ENV.tfvars
+TFVARS_FILE=${2:-environments/$ENV.tfvars}
 
-echo "Applying infrastructure for $ENV..."
-terraform -chdir=infra apply -var-file=environments/$ENV.tfvars -auto-approve
+echo "Planning infrastructure for $ENV using $TFVARS_FILE..."
+terraform -chdir=infra plan -var-file=$TFVARS_FILE
+
+echo "Applying infrastructure for $ENV using $TFVARS_FILE..."
+terraform -chdir=infra apply -var-file=$TFVARS_FILE -auto-approve

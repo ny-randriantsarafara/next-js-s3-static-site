@@ -13,7 +13,6 @@
 /infra/terraform.tfstate
 /infra/terraform.tfstate.backup
 /infra/crash.log
-infra/**/*.tfvars
 
 # Node.js
 node_modules/

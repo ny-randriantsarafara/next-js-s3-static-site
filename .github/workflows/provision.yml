@@ -1,0 +1,37 @@
+name: Provision Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to provision"
+        required: true
+        type: choice
+        options:
+          - development
+          - production
+
+jobs:
+  provision-infra:
+    environment: ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CI_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Provision Infrastructure
+        run: |
+          ./scripts/provision_infra.sh ${{ github.event.inputs.environment }}

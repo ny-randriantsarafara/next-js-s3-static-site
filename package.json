@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "npm install --prefix app",
     "app:dev": "npm run dev --prefix app",
     "app:build": "npm run build --prefix app",
     "app:start": "npm run start --prefix app",
