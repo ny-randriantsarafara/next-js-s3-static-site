@@ -3,7 +3,7 @@
 ENV=$1
 
 if [ -z "$ENV" ]; then
-  echo "Usage: ./scripts/destroy_infra.sh <environment>"
+  echo "Usage: destroy_infra.sh <environment>"
   echo "Environments: development, production"
   exit 1
 fi

@@ -1,33 +1,19 @@
 #!/bin/bash
 
-ENV=$1
+set -euo pipefail
 
-if [ -z "$ENV" ]; then
-  echo "Usage: ./scripts/deploy_app.sh <environment>"
-  echo "Environments: development, production"
-  exit 1
-fi
+INFRA_DIR="infra"
 
 echo "Building Next.js application..."
 npm run app:build
 
 echo "Initializing Terraform..."
-terraform -chdir=infra init
+terraform -chdir="$INFRA_DIR" init -input=false
 
-echo "Getting S3 bucket name for $ENV environment..."
-TFVARS_FILE=${2:-}
+echo "Getting S3 bucket name..."
+S3_BUCKET_NAME=$(terraform -chdir="$INFRA_DIR" output -raw s3_bucket_name)
 
-TFVARS_ARG=""
-if [ -n "$TFVARS_FILE" ]; then
-  TFVARS_ARG="-var-file=$TFVARS_FILE"
-fi
+echo "Deploying application to s3://${S3_BUCKET_NAME}..."
+aws s3 sync app/out/ "s3://${S3_BUCKET_NAME}" --delete
 
-S3_BUCKET_NAME=$(terraform -chdir=infra output -raw s3_bucket_name $TFVARS_ARG)
-
-if [ -z "$S3_BUCKET_NAME" ]; then
-  echo "Error: Could not retrieve S3 bucket name for $ENV environment."
-  exit 1
-fi
-
-echo "Deploying application to s3://$S3_BUCKET_NAME..."
-aws s3 sync app/out/ s3://$S3_BUCKET_NAME --delete
+echo "Changes deployed successfully !"
